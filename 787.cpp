@@ -11,57 +11,49 @@ T Max(const vector<T> v){
 
 class Solution {
 public:
-    vector<int> bfs(const vector<vector<int>> & flights, int src){
-        int n = flights.size();
-        vector<int> dist(n, -1);
-        queue<int> q;
+    vector<vector<char>> buildMatrix(const string & s, int numRows){
+        int cols = s.size();
+        vector<vector<char>> matrix(numRows, vector<char>(cols, ' '));
 
-        dist[src] = 0;
-        q.push(src);
+        int row = 0, col = 0;
+        bool goingDown = true;
 
-        while(!q.empty()){
-            int u = q.front();
-            q.pop();
-            for(const auto & e : flights[u]){
-                int v = e.first;
+        for(int i = 0; i < s.size(); i++){
+            matrix[row][col] = s[i];
 
-                if(dist[v] == -1){
-                    dist[v] = dist[u] + 1;
-                    q.push(v);
+            if(goingDown){
+                if(row == numRows - 1){
+                    goingDown = false;
+                    row--;
+                    col++;
+                } else {
+                    row++;
+                }
+            } else {
+                if (row == 0){
+                    goingDown = true;
+                    row++;
+                } else {
+                    row--;
+                    col++;
                 }
             }
         }
-        return dist;
+        return matrix;
     }
 
+    string convert(string s, int numRows) {
+        if(numRows == 1 || s.size() <= numRows) return s;
+        auto zigzag = buildMatrix(s, numRows);
 
-    vector<int> BelmanFord(vector<vector<int>> & flights, int n, int src){
-        vector<int> distance(n+1);
-        for(int i = 1; i <= n; i++){
-            distance[i] = INT_MAX;
-        }
-        distance[src] = 0;
+        string ans;
 
-        for(int i = 1; i <= n-1; i++){
-            for( const auto & e : flights ){
-                int a = e[0], b = e[1], w = e[2];
-
-
-                distance[b] = min(distance[b], distance[a] + w);
+        for(const auto & row : zigzag){
+            for(const char c : row){
+                if(c != ' ') ans += c;
             }
         }
-
-        return distance;
-    }
-
-    int findCheapestPrice(int n, vector<vector<int>>& flights, int src, int dst, int k) {
-        vector<int> dist = bfs(flights, src);
-        if(dist[dst] > k - 1){
-            return -1;
-        } else {
-            vector<int> distance = BelmanFord(flights, n, src);
-            return distance[dst];
-        }
+        return ans;
     }
 };
 
@@ -70,12 +62,13 @@ int main() {
 
 
     // Call your function
-    vector<vector<int>> times = {{2,1,1},{2,3,1},{3,4,1}};
-    int n = 4, k = 2;
-    int o = sol.networkDelayTime(times, n, k);
+    string s = "PAYPALISHIRING";
+    int numRows = 3;
+
+    cout << sol.convert(s, numRows) << '\n';
 
     // Output the result
-    cout << "Result: " << o << endl;
+    //cout << "Result: " << o << endl;
 
     return 0;
 }
